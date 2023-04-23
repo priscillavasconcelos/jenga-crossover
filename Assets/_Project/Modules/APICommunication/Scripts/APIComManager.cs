@@ -1,4 +1,3 @@
-using Jenga.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,27 +7,13 @@ using UnityEngine.Networking;
 
 namespace Jenga.APICommunication
 {
-    public class APIComManager : MonoBehaviour
+    public class APIComManager
     {
         private readonly string url = "https://ga1vqcu3o1.execute-api.us-east-1.amazonaws.com";
         private readonly string path = "Assessment/stack";
         private int timeout = 10;
-
-        private void Start()
-        {
-            GetAPIInfo<Block>((r) =>
-            {
-
-                foreach (var item in r) 
-                { 
-                    Debug.Log(item.standarddescription);
-
-                }
-
-            });
-        }
-
-        private async void GetAPIInfo<T>(Action<List<T>> action)
+        
+        public async void GetAPIInfo<T>(Action<List<T>> action)
         {
             using UnityWebRequest request = new UnityWebRequest();
 
