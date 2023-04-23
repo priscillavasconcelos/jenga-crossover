@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 namespace Jenga.Builder
 {
@@ -35,7 +36,12 @@ namespace Jenga.Builder
 
             _height = _initialHeight;
 
-            StartCoroutine(SlowSpawn(obj));
+            StartCoroutine(SlowSpawn(OrderList(obj)));
+        }
+
+        private List<Block> OrderList(List<Block> obj)
+        {
+            return obj.OrderBy(x => x.domain).ThenBy(y => y.cluster).ThenBy(z => z.standardid).ToList();
         }
 
         private IEnumerator SlowSpawn(List<Block> obj)
