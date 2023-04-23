@@ -14,30 +14,65 @@ namespace Jenga.Builder
         [SerializeField] private BlockBehaviour _blockGlass;
         [SerializeField] private BlockBehaviour _blockWood;
 
+        [SerializeField] private Vector3[] _positions;
+        private bool _flip = false;
+        private int _currentPosition = 0;
+        private float _initialHeight = 0.5f;
+        private float _height;
+
+        private bool _previousFlip = false;
+
         public void Initialize(List<Block> obj)
         {
             _label.text = obj[0].grade;
 
-            foreach (Block b in obj) 
-            { 
+            _height = _initialHeight;
+
+            StartCoroutine(SlowSpawn(obj));
+        }
+
+        private IEnumerator SlowSpawn(List<Block> obj)
+        {
+            foreach (Block b in obj)
+            {
                 switch (b.mastery)
                 {
-                    default: 
+                    default:
                     case 0:
-                        var glass = Instantiate(_blockGlass, transform);
-                        glass.Initialize(b);
+                        SpawnBlock(_blockGlass, b);
                         break;
                     case 1:
-                        var wood = Instantiate(_blockWood, transform);
-                        wood.Initialize(b);
-                        break; 
+                        SpawnBlock(_blockWood, b);
+                        break;
                     case 2:
-                        var stone = Instantiate(_blockStone, transform);
-                        stone.Initialize(b);
+                        SpawnBlock(_blockStone, b);
                         break;
                 }
-
+                yield return new WaitForSeconds(0.1f);
             }
+        }
+
+        private void SpawnBlock(BlockBehaviour prefab, Block b)
+        {
+            Vector3 pos = _positions[_currentPosition] + new Vector3(0, _height, 0);
+            Vector3 rot = _flip ? new Vector3(0, 90, 0) : Vector3.zero;
+
+            var block = Instantiate(prefab, transform);
+            block.transform.localPosition = pos;
+            block.transform.localEulerAngles = rot;
+
+            block.Initialize(b);
+
+            _currentPosition = _currentPosition < _positions.Length-1 ? _currentPosition + 1 : 0;
+
+            _flip = _currentPosition > 2;
+
+            if (_previousFlip != _flip)
+            {
+                _height += _initialHeight;
+                _previousFlip = _flip;
+            }
+
         }
     }
 }

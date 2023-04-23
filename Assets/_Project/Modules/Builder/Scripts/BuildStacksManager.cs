@@ -9,10 +9,16 @@ namespace Jenga.Builder
     {
         [SerializeField] private StackController _stackController;
 
+        [SerializeField] private float _xToAdd;
+
         private Dictionary<string, List<Block>> _stacks = new Dictionary<string, List<Block>>();
+
+        private Vector3 _initialPosition;
 
         private void Awake()
         {
+            _initialPosition = transform.position;    
+
             APIComManager com = new APIComManager();
 
             com.GetAPIInfo<Block>(BuildScene);
@@ -30,8 +36,10 @@ namespace Jenga.Builder
 
             foreach (var item in _stacks)
             {
-                var stack = Instantiate(_stackController);
+                var stack = Instantiate(_stackController, _initialPosition, Quaternion.identity);
                 stack.Initialize(item.Value);
+
+                _initialPosition += new Vector3(_xToAdd, 0, 0);
             }
         }
     }
