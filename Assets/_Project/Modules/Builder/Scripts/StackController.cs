@@ -1,4 +1,5 @@
 using Jenga.Data;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -22,6 +23,12 @@ namespace Jenga.Builder
 
         private bool _previousFlip = false;
 
+        private List<GameObject> _stoneBlocks = new List<GameObject>();
+        private List<GameObject> _glassBlocks = new List<GameObject>();
+        private List<GameObject> _woodBlocks = new List<GameObject>();
+
+        public Action<Block> ShowDetail;
+
         public void Initialize(List<Block> obj)
         {
             _label.text = obj[0].grade;
@@ -39,20 +46,20 @@ namespace Jenga.Builder
                 {
                     default:
                     case 0:
-                        SpawnBlock(_blockGlass, b);
+                        _glassBlocks.Add(SpawnBlock(_blockGlass, b));
                         break;
                     case 1:
-                        SpawnBlock(_blockWood, b);
+                        _woodBlocks.Add(SpawnBlock(_blockWood, b));
                         break;
                     case 2:
-                        SpawnBlock(_blockStone, b);
+                        _stoneBlocks.Add(SpawnBlock(_blockStone, b));
                         break;
                 }
                 yield return new WaitForSeconds(0.1f);
             }
         }
 
-        private void SpawnBlock(BlockBehaviour prefab, Block b)
+        private GameObject SpawnBlock(BlockBehaviour prefab, Block b)
         {
             Vector3 pos = _positions[_currentPosition] + new Vector3(0, _height, 0);
             Vector3 rot = _flip ? new Vector3(0, 90, 0) : Vector3.zero;
@@ -62,6 +69,7 @@ namespace Jenga.Builder
             block.transform.localEulerAngles = rot;
 
             block.Initialize(b);
+            block.ShowDetail += BlockShowDetail;
 
             _currentPosition = _currentPosition < _positions.Length-1 ? _currentPosition + 1 : 0;
 
@@ -73,6 +81,12 @@ namespace Jenga.Builder
                 _previousFlip = _flip;
             }
 
+            return block.gameObject;
+        }
+
+        private void BlockShowDetail(Block obj)
+        {
+            ShowDetail?.Invoke(obj);
         }
     }
 }

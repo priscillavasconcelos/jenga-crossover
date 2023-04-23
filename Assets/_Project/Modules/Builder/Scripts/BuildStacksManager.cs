@@ -1,5 +1,6 @@
 using Jenga.APICommunication;
 using Jenga.Data;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,12 @@ namespace Jenga.Builder
     public class BuildStacksManager : MonoBehaviour
     {
         [SerializeField] private StackController _stackController;
+
+        [SerializeField] private FocusButtonBehavour _focusButton;
+
+        [SerializeField] private Transform _focusButtonHolder;
+
+        [SerializeField] private BlockDetailBehaviour _blockDetail;
 
         [SerializeField] private float _xToAdd;
 
@@ -38,9 +45,21 @@ namespace Jenga.Builder
             {
                 var stack = Instantiate(_stackController, _initialPosition, Quaternion.identity);
                 stack.Initialize(item.Value);
+                stack.ShowDetail += ShowBlockDetail;
+
+                var b = Instantiate(_focusButton, _focusButtonHolder);
+
+                object[] objArray = { stack, item.Value[0].grade };
+
+                b.Initialize(objArray);
 
                 _initialPosition += new Vector3(_xToAdd, 0, 0);
             }
+        }
+
+        private void ShowBlockDetail(Block obj)
+        {
+            _blockDetail.Initialize(obj);
         }
     }
 }

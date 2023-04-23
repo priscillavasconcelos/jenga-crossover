@@ -1,4 +1,5 @@
 using Jenga.Data;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -8,9 +9,16 @@ namespace Jenga.Builder
     {
         private Block _block;
 
+        public Action<Block> ShowDetail;
+
         public void Initialize(Block obj)
         {
             _block = obj;
+        }
+
+        private void OnMouseUpAsButton()
+        {
+            ShowDetail?.Invoke(_block);
         }
     }
 }
