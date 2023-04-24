@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,13 +11,16 @@ namespace Jenga.Builder
     {
         [SerializeField] private TextMeshProUGUI _label;
 
-        private Button _button;
+        private Toggle _toggle;
 
         private GameObject _stack;
 
+        public Action<GameObject> StackSelected;
+
         private void Awake()
         {
-            _button = GetComponent<Button>();
+            _toggle = GetComponent<Toggle>();
+            _toggle.onValueChanged.AddListener(SelectStack);
         }
 
         public void Initialize(object[] obj)
@@ -25,7 +29,18 @@ namespace Jenga.Builder
 
             _label.text = obj[1] as string;
 
-            
+            _toggle.group = obj[2] as ToggleGroup;
+        }
+
+        private void SelectStack(bool isOn)
+        {
+            if (isOn) 
+                StackSelected?.Invoke(_stack);
+        }
+
+        public GameObject GetStack()
+        {
+            return _stack;
         }
     }
 }

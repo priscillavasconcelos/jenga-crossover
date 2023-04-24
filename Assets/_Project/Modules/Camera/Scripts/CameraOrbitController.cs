@@ -1,6 +1,7 @@
 using Jenga.Builder;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Jenga.Camera
@@ -9,18 +10,24 @@ namespace Jenga.Camera
     {
         [SerializeField] private BuildStacksManager _buildStacksManager;
 
+        [Range(0.01f, 20)]
+        [SerializeField] private float _distanceBetweenCameraAndTarget;
+
         [Range(0.1f, 5f)]
         [SerializeField] private float _mouseRotateSpeed = 0.8f;
         
         [Range(0.01f, 10)]
         [SerializeField] private float _slerpValue = 0.25f;
 
+        [Range(0.01f, 20)]
+        [SerializeField] private float _wheelSpeed = 10;
+
+        [SerializeField] private Vector3 _heightOffset;
+        
         private Transform _target;
         private Transform _transform;
         
         private Quaternion _cameraRot;
-
-        private float _distanceBetweenCameraAndTarget;
 
         private float _minXRotAngle = -80;
         private float _maxXRotAngle = 80;
@@ -28,17 +35,31 @@ namespace Jenga.Camera
         private float _rotX;
         private float _rotY;
 
+        private float _zoomAmount = 0;
+        private float _maxToClamp = 10;
+
+        private Vector3 _position;
+
         private void Awake()
         {
             _transform = transform;
             _buildStacksManager.BuildingIsDone += FinishedBuilding;
         }
 
-        private void FinishedBuilding(List<StackController> obj)
+        private void FinishedBuilding(List<FocusButtonBehavour> obj)
         {
-            _target = obj[0].transform;
+            foreach (var behavour in obj) 
+            {
+                behavour.StackSelected += ChangeTarget;
+            }
 
-            _distanceBetweenCameraAndTarget = Vector3.Distance(_transform.position, _target.position);
+            ChangeTarget(obj[obj.Count - 1].GetStack());
+            
+        }
+
+        private void ChangeTarget(GameObject obj)
+        {
+            _target = obj.transform;
         }
 
         private void Update()
@@ -61,6 +82,11 @@ namespace Jenga.Camera
                 _rotX = _maxXRotAngle;
             }
 
+            var wheel = Input.GetAxis("Mouse ScrollWheel");
+            _zoomAmount += wheel;
+            _zoomAmount = Mathf.Clamp(_zoomAmount, -_maxToClamp, _maxToClamp);
+            
+            _distanceBetweenCameraAndTarget -= wheel * _wheelSpeed;
         }
 
         private void LateUpdate()
@@ -74,8 +100,10 @@ namespace Jenga.Camera
             
             _cameraRot = Quaternion.Slerp(_cameraRot, newQ, _slerpValue);
 
-            _transform.position = _target.position + _cameraRot * dir;
-            _transform.LookAt(_target.position);
+            _position = _target.position + _heightOffset;
+
+            _transform.position = _position + _cameraRot * dir;
+            _transform.LookAt(_position);
 
         }
 

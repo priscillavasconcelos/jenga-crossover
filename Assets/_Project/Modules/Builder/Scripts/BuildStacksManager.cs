@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Jenga.Builder
 {
@@ -23,9 +24,9 @@ namespace Jenga.Builder
 
         private Vector3 _initialPosition;
 
-        private List<StackController> _stacksControllers = new List<StackController>();
+        private List<FocusButtonBehavour> _stacksButtons = new List<FocusButtonBehavour>();
 
-        public Action<List<StackController>> BuildingIsDone;
+        public Action<List<FocusButtonBehavour>> BuildingIsDone;
 
         private void Awake()
         {
@@ -46,32 +47,26 @@ namespace Jenga.Builder
                 _stacks[block.grade].Add(block);
             }
 
+            ToggleGroup group = _focusButtonHolder.GetComponent<ToggleGroup>();
+
             foreach (var item in _stacks)
             {
                 var stack = Instantiate(_stackController, _initialPosition, Quaternion.identity);
                 stack.Initialize(item.Value);
                 stack.ShowDetail += ShowBlockDetail;
 
-                stack.FinishedStack += StackIsDone;
-                
-
                 var b = Instantiate(_focusButton, _focusButtonHolder);
 
-                object[] objArray = { stack, item.Value[0].grade };
+                object[] objArray = { stack.gameObject, item.Value[0].grade, group };
 
                 b.Initialize(objArray);
 
+                _stacksButtons.Add(b);
+
                 _initialPosition += new Vector3(_xToAdd, 0, 0);
             }
-        }
 
-        private void StackIsDone(StackController stack)
-        {
-            _stacksControllers.Add(stack);
-            if (_stacksControllers.Count < _stacks.Count)
-                return;
-            
-            BuildingIsDone?.Invoke(_stacksControllers);
+            BuildingIsDone?.Invoke(_stacksButtons);
         }
 
         private void ShowBlockDetail(Block obj)
