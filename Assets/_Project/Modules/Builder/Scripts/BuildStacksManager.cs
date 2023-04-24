@@ -1,7 +1,6 @@
 using Jenga.APICommunication;
 using Jenga.Data;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,6 +44,10 @@ namespace Jenga.Builder
         {
             foreach (var block in blocks) 
             {
+                string grade = block.grade.ToLower();
+                if (!grade.Contains("grade"))
+                    continue;
+
                 if (!_stacks.ContainsKey(block.grade))
                     _stacks.Add(block.grade, new List<Block>());
 
