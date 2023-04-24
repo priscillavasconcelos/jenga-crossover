@@ -20,6 +20,8 @@ namespace Jenga.Builder
 
         [SerializeField] private float _xToAdd;
 
+        [SerializeField] private CanvasGroup _canvas;
+
         private Dictionary<string, List<Block>> _stacks = new Dictionary<string, List<Block>>();
 
         private List<StackController> _stackControllers = new List<StackController>();
@@ -69,6 +71,10 @@ namespace Jenga.Builder
 
                 _initialPosition += new Vector3(_xToAdd, 0, 0);
             }
+
+            _canvas.alpha= 1;
+            _canvas.interactable= true;
+            _canvas.blocksRaycasts= true;
 
             BuildingIsDone?.Invoke(_stacksButtons);
         }
