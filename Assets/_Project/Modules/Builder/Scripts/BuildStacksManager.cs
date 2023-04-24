@@ -22,6 +22,8 @@ namespace Jenga.Builder
 
         private Dictionary<string, List<Block>> _stacks = new Dictionary<string, List<Block>>();
 
+        private List<StackController> _stackControllers = new List<StackController>();
+
         private Vector3 _initialPosition;
 
         private List<FocusButtonBehavour> _stacksButtons = new List<FocusButtonBehavour>();
@@ -55,6 +57,8 @@ namespace Jenga.Builder
                 stack.Initialize(item.Value);
                 stack.ShowDetail += ShowBlockDetail;
 
+                _stackControllers.Add(stack);
+
                 var b = Instantiate(_focusButton, _focusButtonHolder);
 
                 object[] objArray = { stack.gameObject, item.Value[0].grade, group };
@@ -72,6 +76,11 @@ namespace Jenga.Builder
         private void ShowBlockDetail(Block obj)
         {
             _blockDetail.Initialize(obj);
+        }
+
+        public List<StackController> GetStacks()
+        {
+            return _stackControllers;
         }
     }
 }

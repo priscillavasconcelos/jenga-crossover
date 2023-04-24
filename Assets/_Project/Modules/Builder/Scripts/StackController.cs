@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using System.Linq;
+using static UnityEditor.PlayerSettings;
 
 namespace Jenga.Builder
 {
@@ -28,8 +29,25 @@ namespace Jenga.Builder
         private List<GameObject> _glassBlocks = new List<GameObject>();
         private List<GameObject> _woodBlocks = new List<GameObject>();
 
+        private List<BlockTransform> _allBlocks = new();
+
         public Action<StackController> FinishedStack;
         public Action<Block> ShowDetail;
+
+        public List<GameObject> GetStoneBlocks() { return _stoneBlocks; }
+        public List<GameObject> GetGlassBlocks() { return _glassBlocks; }
+        public List<GameObject> GetWoodBlocks() { return _woodBlocks; }
+
+        public void ResetStack()
+        {
+            foreach (var item in _allBlocks)
+            {
+                item.BlockObj.SetActive(false);
+                item.BlockObj.transform.localPosition = item.Position;
+                item.BlockObj.transform.localEulerAngles = item.Rotation;
+                item.BlockObj.SetActive(true);
+            }
+        }
 
         public void Initialize(List<Block> obj)
         {
@@ -76,6 +94,9 @@ namespace Jenga.Builder
             var block = Instantiate(prefab, transform);
             block.transform.localPosition = pos;
             block.transform.localEulerAngles = rot;
+
+            var blockTransform = new BlockTransform(pos, rot, block.gameObject);
+            _allBlocks.Add(blockTransform);
 
             block.Initialize(b);
             block.ShowDetail += BlockShowDetail;

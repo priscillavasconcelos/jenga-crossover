@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Jenga.Builder;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,6 +8,8 @@ namespace Jenga.Mods
 {
     public abstract class Mod : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] protected BuildStacksManager _buildStacksManager;
+
         [SerializeField] private GameObject _toolTip;
         private Button _button;
 
