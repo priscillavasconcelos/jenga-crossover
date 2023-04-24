@@ -1,6 +1,5 @@
 using Jenga.Data;
 using System;
-using TMPro;
 using UnityEngine;
 
 namespace Jenga.Builder
@@ -16,9 +15,13 @@ namespace Jenga.Builder
             _block = obj;
         }
 
-        private void OnMouseUpAsButton()
+        private void OnMouseOver()
         {
-            ShowDetail?.Invoke(_block);
+            if (Input.GetMouseButtonUp(1))
+            {
+                ShowDetail?.Invoke(_block);
+            }
         }
+
     }
 }
