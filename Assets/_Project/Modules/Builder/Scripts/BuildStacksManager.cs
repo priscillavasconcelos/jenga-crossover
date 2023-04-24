@@ -1,5 +1,7 @@
 using Jenga.APICommunication;
 using Jenga.Data;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +22,10 @@ namespace Jenga.Builder
         private Dictionary<string, List<Block>> _stacks = new Dictionary<string, List<Block>>();
 
         private Vector3 _initialPosition;
+
+        private List<StackController> _stacksControllers = new List<StackController>();
+
+        public Action<List<StackController>> BuildingIsDone;
 
         private void Awake()
         {
@@ -46,6 +52,9 @@ namespace Jenga.Builder
                 stack.Initialize(item.Value);
                 stack.ShowDetail += ShowBlockDetail;
 
+                stack.FinishedStack += StackIsDone;
+                
+
                 var b = Instantiate(_focusButton, _focusButtonHolder);
 
                 object[] objArray = { stack, item.Value[0].grade };
@@ -54,6 +63,15 @@ namespace Jenga.Builder
 
                 _initialPosition += new Vector3(_xToAdd, 0, 0);
             }
+        }
+
+        private void StackIsDone(StackController stack)
+        {
+            _stacksControllers.Add(stack);
+            if (_stacksControllers.Count < _stacks.Count)
+                return;
+            
+            BuildingIsDone?.Invoke(_stacksControllers);
         }
 
         private void ShowBlockDetail(Block obj)

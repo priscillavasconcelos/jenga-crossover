@@ -28,6 +28,7 @@ namespace Jenga.Builder
         private List<GameObject> _glassBlocks = new List<GameObject>();
         private List<GameObject> _woodBlocks = new List<GameObject>();
 
+        public Action<StackController> FinishedStack;
         public Action<Block> ShowDetail;
 
         public void Initialize(List<Block> obj)
@@ -63,6 +64,8 @@ namespace Jenga.Builder
                 }
                 yield return new WaitForSeconds(0.1f);
             }
+
+            FinishedStack?.Invoke(this);
         }
 
         private GameObject SpawnBlock(BlockBehaviour prefab, Block b)
